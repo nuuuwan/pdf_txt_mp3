@@ -2,10 +2,11 @@ import os
 import tempfile
 from functools import cached_property
 
+import requests
 from gtts import gTTS
 from pdfminer.high_level import extract_text
 from pydub import AudioSegment
-from utils import File, Log
+from utils import File, JSONFile, Log
 
 log = Log('Converter')
 
@@ -114,3 +115,27 @@ class Converter:
             return True
 
         return Converter('txt', 'mp3', convert)
+
+    @staticmethod
+    def json_to_pdf():
+        def process_data(data):
+            url = data['url']
+            basename = data['basename']
+
+            path_target = os.path.join(DIR_DATA, 'pdf', basename + '.pdf')
+            if os.path.exists(path_target):
+                log.warning(f'☑️ {path_target} already exists')
+                return
+
+            # download binary from url using requests
+            response = requests.get(url)
+            with open(path_target, 'wb') as f:
+                f.write(response.content)
+            log.info(f'✅ Converted {url} to {path_target}')
+
+        def convert(path_source: str, _) -> bool:
+            data_list = JSONFile(path_source).read()
+            for data in data_list:
+                process_data(data)
+
+        return Converter('json', 'pdf', convert)
