@@ -15,10 +15,17 @@ DIR_DATA = 'data'
 
 
 class Converter:
-    def __init__(self, ext_source: str, ext_target: str, convert: callable):
+    def __init__(
+        self,
+        ext_source: str,
+        ext_target: str,
+        convert: callable,
+        max_runs: int,
+    ):
         self.ext_source = ext_source
         self.ext_target = ext_target
         self.convert = convert
+        self.max_runs = 1
 
     @cached_property
     def dir_source(self) -> str:
@@ -62,8 +69,13 @@ class Converter:
         self.init_dirs()
         n = 0
         for filename in os.listdir(self.dir_source):
-            if self.process_filename(filename):
-                n += 1
+            try:
+                if self.process_filename(filename):
+                    n += 1
+                    if n >= self.max_runs:
+                        break
+            except Exception as e:
+                log.error(f'❌ Failed to process {filename}: {e}')
 
         log.info(f'✅✅ Converted {n} pdf files to txt files')
 
@@ -96,7 +108,7 @@ class Converter:
             log.info(f'✅ Converted {path_source} to {path_target}')
             return True
 
-        return Converter('pdf', 'txt', convert)
+        return Converter('pdf', 'txt', convert, 10)
 
     @staticmethod
     def txt_to_mp3():
@@ -106,7 +118,7 @@ class Converter:
             tts.save(temp_path)
             audio = AudioSegment.from_file(temp_path)
             log.debug(f'{i+1}/{n} -> {temp_path}')
-            t_sleep = random.random() 
+            t_sleep = random.random()
             log.debug(f'😴 {t_sleep:.1f}s')
             time.sleep(t_sleep)
             return audio
@@ -124,7 +136,7 @@ class Converter:
             log.info(f'✅ Converted {path_source} to {path_target}')
             return True
 
-        return Converter('txt', 'mp3', convert)
+        return Converter('txt', 'mp3', convert, 1)
 
     @staticmethod
     def urltxt_to_x():
@@ -153,4 +165,4 @@ class Converter:
                 file_name_only = lines[i * 2 + 1]
                 process_data(url, file_name_only)
 
-        return Converter('url.txt', None, convert)
+        return Converter('url.txt', None, convert, 10)
