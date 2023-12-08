@@ -1,5 +1,7 @@
 import os
+import random
 import tempfile
+import time
 from functools import cached_property
 
 import requests
@@ -105,6 +107,9 @@ class Converter:
             tts.save(temp_path)
             audio = AudioSegment.from_file(temp_path)
             log.debug(f'{i+1}/{n} -> {temp_path}')
+            t_sleep = random.random() * 1 + 1
+            log.debug(f'😴 {t_sleep:.1f}s')
+            time.sleep(t_sleep)
             return audio
 
         def convert(path_source: str, path_target: str) -> bool:
