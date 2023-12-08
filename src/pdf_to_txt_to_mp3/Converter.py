@@ -1,9 +1,8 @@
 import os
-import random
 import tempfile
-import time
 from functools import cached_property
-
+import random
+import time
 import requests
 from gtts import gTTS
 from pdfminer.high_level import extract_text
@@ -107,7 +106,7 @@ class Converter:
             tts.save(temp_path)
             audio = AudioSegment.from_file(temp_path)
             log.debug(f'{i+1}/{n} -> {temp_path}')
-            t_sleep = random.random() * 1 + 1
+            t_sleep = random.random() 
             log.debug(f'😴 {t_sleep:.1f}s')
             time.sleep(t_sleep)
             return audio
