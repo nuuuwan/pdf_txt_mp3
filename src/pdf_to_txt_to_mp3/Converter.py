@@ -6,7 +6,7 @@ import requests
 from gtts import gTTS
 from pdfminer.high_level import extract_text
 from pydub import AudioSegment
-from utils import File, JSONFile, Log
+from utils import File, Log
 
 log = Log('Converter')
 
@@ -25,27 +25,33 @@ class Converter:
 
     @cached_property
     def dir_target(self) -> str:
+        if not self.ext_target:
+            return None
         return os.path.join(DIR_DATA, self.ext_target)
 
     def init_dirs(self):
-        if not os.path.exists(self.dir_source):
+        if self.dir_source and not os.path.exists(self.dir_source):
             os.makedirs(self.dir_source)
 
-        if not os.path.exists(self.dir_target):
+        if self.dir_target and not os.path.exists(self.dir_target):
             os.makedirs(self.dir_target)
 
     def process_filename(self, filename: str) -> bool:
         if not filename.endswith(self.ext_source):
             return False
         path_source = os.path.join(self.dir_source, filename)
-        path_target = os.path.join(
-            self.dir_target,
-            filename[: -len(self.ext_source)] + self.ext_target,
-        )
 
-        if os.path.exists(path_target):
-            log.warning(f'☑️ {path_target} already exists')
-            return False
+        if self.dir_target:
+            path_target = os.path.join(
+                self.dir_target,
+                filename[: -len(self.ext_source)] + self.ext_target,
+            )
+
+            if os.path.exists(path_target):
+                log.warning(f'☑️ {path_target} already exists')
+                return False
+        else:
+            path_target = None
 
         if self.convert(path_source, path_target):
             return True
@@ -117,12 +123,13 @@ class Converter:
         return Converter('txt', 'mp3', convert)
 
     @staticmethod
-    def json_to_pdf():
-        def process_data(data):
-            url = data['url']
-            basename = data['basename']
-
-            path_target = os.path.join(DIR_DATA, 'pdf', basename + '.pdf')
+    def urltxt_to_x():
+        def process_data(url, file_name_only):
+            ext_target = file_name_only.split('.')[-1]
+            dir_target = os.path.join(DIR_DATA, ext_target)
+            if not os.path.exists(dir_target):
+                os.makedirs(dir_target)
+            path_target = os.path.join(dir_target, file_name_only)
             if os.path.exists(path_target):
                 log.warning(f'☑️ {path_target} already exists')
                 return
@@ -134,8 +141,12 @@ class Converter:
             log.info(f'✅ Converted {url} to {path_target}')
 
         def convert(path_source: str, _) -> bool:
-            data_list = JSONFile(path_source).read()
-            for data in data_list:
-                process_data(data)
+            lines = File(path_source).read_lines()
+            lines = [line for line in lines if line.strip()]
+            n = len(lines) // 2
+            for i in range(n):
+                url = lines[i * 2]
+                file_name_only = lines[i * 2 + 1]
+                process_data(url, file_name_only)
 
-        return Converter('json', 'pdf', convert)
+        return Converter('url.txt', None, convert)
