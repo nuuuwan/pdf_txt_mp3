@@ -1,8 +1,9 @@
 import os
-import tempfile
-from functools import cached_property
 import random
+import tempfile
 import time
+from functools import cached_property
+
 import requests
 from gtts import gTTS
 from pdfminer.high_level import extract_text
@@ -11,10 +12,10 @@ from utils import File, Log
 
 log = Log('Converter')
 
-DIR_DATA = 'data'
-
 
 class Converter:
+    DIR_DATA = 'data'
+
     def __init__(
         self,
         ext_source: str,
@@ -29,13 +30,13 @@ class Converter:
 
     @cached_property
     def dir_source(self) -> str:
-        return os.path.join(DIR_DATA, self.ext_source)
+        return os.path.join(Converter.DIR_DATA, self.ext_source)
 
     @cached_property
     def dir_target(self) -> str:
         if not self.ext_target:
             return None
-        return os.path.join(DIR_DATA, self.ext_target)
+        return os.path.join(Converter.DIR_DATA, self.ext_target)
 
     def init_dirs(self):
         if self.dir_source and not os.path.exists(self.dir_source):
@@ -142,7 +143,7 @@ class Converter:
     def urltxt_to_x():
         def process_data(url, file_name_only):
             ext_target = file_name_only.split('.')[-1]
-            dir_target = os.path.join(DIR_DATA, ext_target)
+            dir_target = os.path.join(Converter.DIR_DATA, ext_target)
             if not os.path.exists(dir_target):
                 os.makedirs(dir_target)
             path_target = os.path.join(dir_target, file_name_only)
