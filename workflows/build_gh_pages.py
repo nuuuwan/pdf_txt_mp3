@@ -1,6 +1,6 @@
 import os
 
-from utils import Log, _
+from utils import TIME_FORMAT_TIME, Log, Time, _
 
 from pdf_to_txt_to_mp3 import Converter
 
@@ -22,7 +22,7 @@ def render_for_mp3(file_name_only: str, url: str):
                 [
                     _('source', None, dict(src=url, type='audio/mpeg')),
                 ],
-                dict(controls='controls', style="width:90%"),
+                dict(controls='controls', style="width:90%; margin:6px;"),
             ),
         ],
     )
@@ -50,10 +50,13 @@ def build_for_ext(ext: str):
             _('title', 'PDF to TXT to MP3'),
         ],
     )
+    time_str = TIME_FORMAT_TIME.stringify(Time.now())
+    last_updated_text = f'Last Updated {time_str}.'
     body = _(
         'body',
         [
             _('h1', 'Contents'),
+            _('p', last_updated_text),
             _('div', child_list),
         ],
     )
