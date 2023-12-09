@@ -32,9 +32,11 @@ jobs:
         git pull origin gh-pages
 
         wget -O index.html https://raw.githubusercontent.com/nuuuwan/pdf_txt_mp3/main/data/index.html
+        MESSAGE="copy_gh_pages $(date)"
+        $MESSAGE >> cron.log
 
         git add .
-        git commit -m "copy_gh_pages $(date)"
+        git commit -m $MESSAGE
         git push origin gh-pages
 
       

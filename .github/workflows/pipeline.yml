@@ -44,8 +44,12 @@ jobs:
         git config --global user.name "${{ secrets.GIT_USER_NAME }}"
         
         git pull origin main
+
+        MESSAGE="pipeline $(date)"
+        $MESSAGE >> cron.log
+
         git add .
-        git commit -m "pipeline $(date)"
+        git commit -m $MESSAGE
         git push origin main
 
       
