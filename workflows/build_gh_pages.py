@@ -51,6 +51,7 @@ def build_for_ext(ext: str):
         ],
     )
     time_str = TIME_FORMAT_TIME.stringify(Time.now())
+    log.debug(f'{time_str=}')
     last_updated_text = f'Last Updated {time_str}.'
     body = _(
         'body',
