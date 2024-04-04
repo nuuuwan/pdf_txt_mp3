@@ -1,6 +1,6 @@
 import os
 
-from utils import TIME_FORMAT_TIME, Log, Time, _
+from utils import TimeFormat, Log, Time, _
 
 from pdf_to_txt_to_mp3 import Converter
 
@@ -50,7 +50,7 @@ def build_for_ext(ext: str):
             _('title', 'PDF to TXT to MP3'),
         ],
     )
-    time_str = TIME_FORMAT_TIME.stringify(Time.now())
+    time_str = TimeFormat.TIME.stringify(Time.now())
     log.debug(f'{time_str=}')
     last_updated_text = f'Last Updated {time_str}.'
     body = _(
